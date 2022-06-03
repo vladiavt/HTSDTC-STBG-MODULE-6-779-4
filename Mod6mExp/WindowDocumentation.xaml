@@ -1,0 +1,18 @@
+﻿<Window x:Class="Machine.WindowDocumentation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Документация" 
+				Loaded="Window_Loaded" MinHeight="300" MinWidth="500">
+
+
+	<Grid>
+		<WebBrowser Name="webBrowser" Margin="0,50,0,0"/>
+		<Button Content="Home" Height="40" HorizontalAlignment="Left" Margin="150,5,0,0" Name="buttonHome" VerticalAlignment="Top" Width="75" 
+						Style="{StaticResource AppDefaultButtonStyle}" BorderBrush="#FF707070" Background="#FF006699" />
+		<Button Content="ç" Height="40" HorizontalAlignment="Left" Margin="10,5,0,0" Name="buttonBck" Style="{StaticResource AppDefaultButtonStyle}" 
+						VerticalAlignment="Top" Width="40" Background="#FF006699" FontSize="18" FontFamily="Wingdings" Click="buttonBck_Click" />
+		<Button Content="è" Height="40" HorizontalAlignment="Left" Margin="70,5,0,0" Name="buttonFrd" Style="{StaticResource AppDefaultButtonStyle}" 
+						VerticalAlignment="Top" Width="40" Background="#FF006699" FontSize="18" FontFamily="Wingdings" Click="buttonFrd_Click" />
+		<Button Content="X" Height="40" HorizontalAlignment="Right" Margin="0,5,10,0" Name="buttonClose" VerticalAlignment="Top" Width="50" Style="{StaticResource closeButtonStyle}" IsCancel="True" />
+	</Grid>
+</Window>

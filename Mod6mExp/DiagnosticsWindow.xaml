@@ -1,0 +1,793 @@
+﻿<Window x:Class="Machine.DiagnosticsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:my="clr-namespace:Machine"
+		xmlns:common="clr-namespace:Machine.Common;assembly=COMMON_HMI"
+        xmlns:kbd="clr-namespace:Machine.Common.VirtualKeyboard;assembly=COMMON_HMI"
+        xmlns:CognexQBVisionControl="clr-namespace:CognexQBVisionControl;assembly=CognexSystem"
+        Title="Диагностика и настройки" WindowStartupLocation="Manual"  
+        MaxHeight="758" MaxWidth="1024"
+				Loaded="Window_Loaded" ResizeMode="NoResize" Closing="Window_Closing"
+				AllowsTransparency="True" WindowStyle="None" Background="Transparent"
+				Style="{StaticResource WindowDefaultStyle}"
+				TextOptions.TextFormattingMode="Display"
+				SnapsToDevicePixels="True">
+
+    <Window.Resources>
+        <!--<my:ContentToPathConverter x:Key="content2PathConverter"/>
+        <my:ContentToMarginConverter x:Key="content2MarginConverter"/>-->
+        <Style x:Key="DisabledTextBox" TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="LightSkyBlue" />
+            <Style.Triggers>
+                <Trigger Property="IsReadOnly" Value="True">
+                    <Setter Property="Background" Value="Red" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DefaultCellStyle" TargetType="{x:Type DataGridCell}">
+            <Style.Triggers>
+                <Trigger Property="DataGridCell.IsSelected" Value="True">
+                    <Setter Property="BorderBrush">
+                        <Setter.Value>
+                            <SolidColorBrush Color="Transparent"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource
+                                   {x:Static SystemColors.ControlTextBrushKey}}"/>
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="Transparent"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="InputLedStyle" TargetType="common:LedIndicator2">
+            <Style.Setters>
+                <Setter Property="ColorActive" Value="#FF58FF18"/>
+                <Setter Property="ColorInactive" Value="#FF0A380A"/>
+                <Setter Property="IndicatorType" Value="LED_INPUT"/>
+                <Setter Property="IndicatorDiameter" Value="18"/>
+                <Setter Property="TextSize" Value="12"/>
+                <Setter Property="FontFamily" Value="Arial"/>
+            </Style.Setters>
+        </Style>
+        <Style x:Key="OutputLedStyle" TargetType="common:LedIndicator2">
+            <Style.Setters>
+                <Setter Property="ColorActive" Value="#FFF10000"/>
+                <Setter Property="ColorInactive" Value="#FF440000"/>
+                <Setter Property="IndicatorType" Value="LED_OUTPUT"/>
+                <Setter Property="IndicatorDiameter" Value="20"/>
+                <Setter Property="TextSize" Value="12"/>
+            </Style.Setters>
+        </Style>
+        <Style x:Key="DiagLabelStyle" TargetType="Label">
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+        </Style>
+        <Style x:Key="DiagTextboxStyle" TargetType="TextBox">
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="BorderBrush" Value="DarkSalmon" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="DiagComboboxStyle" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Width" Value="120" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="3,0,0,0" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="BorderBrush" Value="DarkSalmon" />
+        </Style>
+        <Style x:Key="ButtonMotorStepStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="1" CornerRadius="2" BorderBrush="Black">
+                            <Border BorderThickness="2" CornerRadius="2" BorderBrush="#FFFFD194" Background="#FF3E82F3">
+                                <TextBlock Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" FontFamily="Wingdings" FontSize="26" 
+													 HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect Opacity="1" ShadowDepth="0" BlurRadius="15"/>
+                                    </TextBlock.Effect>
+                                </TextBlock>
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ButtonMotorStepZeroStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="1" CornerRadius="2" BorderBrush="Black">
+                            <Border BorderThickness="2" CornerRadius="2" BorderBrush="#FFFFD194" Background="#FF3E82F3">
+                                <Path Width="31" Height="30" Data="M5,14 L16,4 L1,4 L1,1 L30,1 L30,4 L16,4 L25,14 L25,20 L18,14 L18,27 L13,27 L13,14 L6,20 L6,14Z" Fill="White" RenderOptions.EdgeMode="Aliased">
+                                    <Path.Effect>
+                                        <DropShadowEffect Opacity="1" ShadowDepth="0" BlurRadius="15"/>
+                                    </Path.Effect>
+                                </Path>
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ButtonMotorRotateStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="1" CornerRadius="2" BorderBrush="Black">
+                            <Border BorderThickness="2" CornerRadius="2" BorderBrush="#FFFFD194" Background="#FF3E82F3">
+                                <TextBlock Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" FontFamily="Wingdings 3" FontSize="36" 
+													 HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect Opacity="1" ShadowDepth="0" BlurRadius="15"/>
+                                    </TextBlock.Effect>
+                                </TextBlock>
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="LabelStyle" TargetType="Label">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontFamily" Value="Segoe" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect ShadowDepth="0.5" BlurRadius="5" Opacity="1"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="LabelStyleMotorPostion" TargetType="Label">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="Padding" Value="0,0,5,0"/>
+            <Setter Property="Background" Value="#FFFAFAB8"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="Content" Value="0.0"/>
+            <Setter Property="Padding" Value="0,0,5,0"/>
+        </Style>
+        <Style x:Key="LabelStyleMotorStatus" TargetType="Label">
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="Padding" Value="0,0,5,0"/>
+            <Setter Property="Background" Value="#FFFAFAB8"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="Content" Value="0000"/>
+            <Setter Property="Padding" Value="0,0,5,0"/>
+        </Style>
+        <Style x:Key="LabelStyleMotorTargetPosition" TargetType="Label">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="Foreground" Value="DarkGray"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="Content" Value="target"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style x:Key="TextboxStyleMotorInput" TargetType="TextBox">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Segoe"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="0,1,0,0"/>
+            <Setter Property="Width" Value="65"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+        <Style x:Key="LedStatusStyle" TargetType="common:LedIndicator">
+            <Setter Property="Height" Value="13" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="LedSize" Value="SmallOval" />
+        </Style>
+        <Style x:Key="StyleLabelDiagVisionResultName" TargetType="Label">
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10,0,5,0"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+        <Style x:Key="StyleLedInput" TargetType="common:LedIndicator">
+            <Setter Property="LedSize" Value="Small"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+        <Style x:Key="DiagStatusLabelStyle" TargetType="{x:Type Label}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border BorderThickness="1" BorderBrush="Black" CornerRadius="2" VerticalAlignment="Top"  
+									Background="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"
+									Height="{Binding Height, RelativeSource={RelativeSource TemplatedParent}}">
+                            <TextBlock FontSize="12" Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" 
+												Padding="5,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" FontWeight="Medium" 
+												Foreground="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="RoundedButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="5" BorderBrush="Blue" Background="LightBlue" BorderThickness="1" Padding="2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="BorderBrush" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="HoverBrush" Color="#FFFF4500"/>
+        <LinearGradientBrush x:Key="TabControlBackgroundBrush" EndPoint="0.5,0" StartPoint="0.5,1">
+            <GradientStop Color="#FFD6E4EF" Offset="0"/>
+            <GradientStop Color="#FFF5FCFF" Offset="0.3"/>
+            <GradientStop Color="#FFf2fafd" Offset="0.85"/>
+            <GradientStop Color="#FFE9F4F5" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="TabItemPathBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#FFAEC1D4" Offset="0"/>
+            <GradientStop Color="#FFE6F2F2" Offset="1"/>
+        </LinearGradientBrush>
+        <Style x:Key="TabControlStyle" TargetType="{x:Type TabControl}">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="1" BorderThickness="2,0,2,2" Panel.ZIndex="2" CornerRadius="0,0,2,2"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                Background="{StaticResource TabControlBackgroundBrush}">
+                                <ContentPresenter ContentSource="SelectedContent"/>
+                            </Border>
+                            <StackPanel Orientation="Horizontal" Grid.Row="0" Panel.ZIndex="1" IsItemsHost="true"/>
+                            <Rectangle Grid.Row="0" Height="2" VerticalAlignment="Bottom" Fill="{StaticResource BorderBrush}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Name="grdMainWindow">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="15*"/>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="8*"/>
+            <ColumnDefinition Width="15*"/>
+            <ColumnDefinition Width="15*"/>
+        </Grid.ColumnDefinitions>
+        <TabControl FontSize="14" Name="tabControlDiag" SelectionChanged="tabControlDiag_SelectionChanged" Margin="0" Grid.ColumnSpan="5" >
+            <TabItem Name="tbIO" Header="Станции">
+                <Grid Name="grdTestDiag" Width="Auto" Height="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Name="CI1" Header="Common Inputs 1" Grid.Column="0" Grid.Row="0" Margin="5,5">
+                        <DataGrid Name="bitsCommonInputs1" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Name="CO" Header="Common outputs" Grid.Column="2" Grid.Row="0" Margin="5,5">
+                        <DataGrid Name="bitsCommonOutputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" PreviewMouseDown="LedOutput_MouseDown" Style="{StaticResource OutputLedStyle}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Name ="gbPos1Title" Header="Station 1 I/O" Margin="5,5" Grid.Column="3" Grid.Row="0" >
+                        <StackPanel Orientation="Vertical" Grid.RowSpan="3">
+                            <DataGrid Name="bitsPos1Inputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <DataGrid Name="bitsPos1Outputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" PreviewMouseDown="LedOutput_MouseDown" Style="{StaticResource OutputLedStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Name ="gbPos2Title" Header="Station 2 I/O" Grid.Column="4" Grid.Row="0" Margin="5,5">
+                        <StackPanel Orientation="Vertical" Grid.RowSpan="3">
+                            <DataGrid Name="bitsPos2Inputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <DataGrid Name="bitsPos2Outputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" PreviewMouseDown="LedOutput_MouseDown" Style="{StaticResource OutputLedStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Name ="gbPos3Title" Header="Station 3 I/O" Grid.Column="5" Grid.Row="0" Margin="5,5">
+                        <StackPanel Orientation="Vertical" Grid.RowSpan="3">
+                            <DataGrid Name="bitsPos3Inputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <DataGrid Name="bitsPos3Outputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" PreviewMouseDown="LedOutput_MouseDown" Style="{StaticResource OutputLedStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Name="tbMotors" Header="Мотори">
+                <Grid Name="grdMotors" Width="Auto" Height="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Name="iFE" Header="Festo Inputs" Grid.Column="0" Grid.Row="0" Margin="5,5">
+                        <DataGrid Name="bitsFestoInputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Name="oFE" Header="Festo Outputs" Grid.Column="1" Grid.Row="0" Margin="5,5">
+                        <DataGrid Name="bitsFestoOutputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" PreviewMouseDown="LedOutput_MouseDown" Style="{StaticResource OutputLedStyle}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Name="iLM" Header="LinMot Inputs" Grid.Column="2" Grid.Row="0" Margin="5,5">
+                        <DataGrid Name="bitsLinMotInputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Name="oLM" Header="LinMot Outputs" Grid.Column="3" Grid.Row="0" Margin="5,5">
+                        <DataGrid Name="bitsLinMotOutputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" PreviewMouseDown="LedOutput_MouseDown" Style="{StaticResource OutputLedStyle}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Name="controlFE" Header="Festo Control (only moves by steps in relative mode)" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="5,5">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Current pos" Width="90"/>
+                                <TextBox Name="tbFestoCurrentPos" Text="{Binding FEI_CurrentPosition, StringFormat={}{0:F3}}" Width="60" Margin="10,0,0,0" IsEnabled="false"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="target Pos" Width="90"/>
+                                <TextBox Name="tbFestoTargetPos" Text="000.00" Width="60" Margin="10,0,0,0"/>
+                                <Label Content="Target Vel" Width="90" Margin="20,0,0,0"/>
+                                <TextBox Name="tbFestoTargetVel" Text="000.00" Width="60"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock Name="lblStateFE" Text="{Binding StateF, StringFormat=State {0:00}}" Margin="5,0,0,0"/>
+                                <Button Name="btnFestoInit" Content="Init" Margin="10,0,0,0" FontWeight="Bold" Width="55" Click="btnFestoInit_Click"/>
+                                <Button Name="btnFestoClear" Content="Clear" Margin="10,0,0,0" FontWeight="Bold" Width="55" Click="btnFestoClear_Click"/>
+                                <Button Name="btnFestoHome" Content="Home" Margin="10,0,0,0" FontWeight="Bold" Width="55" Click="btnFestoHome_Click"/>
+                                <Button Name="btnFestoGo" Content="Go" Margin="10,0,0,0" FontWeight="Bold" Width="55" Click="btnFestoGo_Click"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10,5">
+                                <Button Name="btnFestoSetCapturePos" Content="Set Capture Pos" Margin="5,0,0,0" FontWeight="Bold" Click="btnFestoSetCapture_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Name="controlLM" Header="LinMot Control" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="2" Margin="5,5">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Current pos" Width="90"/>
+                                <TextBox Name="tbLinMotCurrentPos" Text="{Binding LMI_CurrentPosition, StringFormat={}{0:F3}}" Width="60" Margin="10,0,0,0" IsEnabled="false"/>
+                                <Label Content="Acc/Dec" Width="90" Margin="20,0,0,0"/>
+                                <TextBox Name="tbLinMotTargetAcc" Text="000.00" Width="60"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Target pos" Width="90"/>
+                                <TextBox Name="tbLinMotTargetPos" Text="000.00" Width="60" Margin="10,0,0,0"/>
+                                <Label Content="Target Vel" Width="90" Margin="20,0,0,0"/>
+                                <TextBox Name="tbLinMotTargetVel" Text="000.00" Width="60"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock Name="lblStateLM" Text="{Binding StateT, StringFormat=State {0:00}}" Margin="5,0,0,0"/>
+                                <Button Name="btnLinMotInit" Content="Init" Margin="10,0,0,0" FontWeight="Bold" Width="55" Click="btnLinMotInit_Click"/>
+                                <Button Name="btnLinMotClear" Content="Clear" Margin="10,0,0,0" FontWeight="Bold" Width="55" Click="btnLinMotClear_Click"/>
+                                <Button Name="btnLinMotHome" Content="Home" Margin="10,0,0,0" FontWeight="Bold" Width="55" Click="btnLinMotHome_Click"/>
+                                <Button Name="btnLinMotGo" Content="Go" Margin="10,0,0,0" FontWeight="Bold" Width="55" Click="btnLinMotGo_Click"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,10">
+                                <TextBlock Name="lblErrorLM"  Text="{Binding ErrorT, StringFormat='Error 0x{0:X2}'}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <TextBox Name="tbError" Style="{StaticResource DisabledTextBox}"
+                        Text="{Binding ErrorText}" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Foreground="White" FontWeight="Bold" Background="Salmon">
+                    </TextBox>
+               </Grid>
+            </TabItem>
+            <TabItem Name="tbLasers" Header="Лазери">
+                <Grid Name="grdLasers" Width="Auto" Height="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Name="iWL" Header="WeldLas Inputs" Grid.Column="0" Grid.Row="0" Margin="5,5">
+                        <DataGrid Name="bitsWeldLasInputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Name="oWL" Header="WeldLas Outputs" Grid.Column="1" Grid.Row="0" Margin="5,5">
+                        <DataGrid Name="bitsWeldLasOutputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" PreviewMouseDown="LedOutput_MouseDown" Style="{StaticResource OutputLedStyle}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Name="iML" Header="MarkLas Inputs" Grid.Column="2" Grid.Row="0" Margin="5,5">
+                        <DataGrid Name="bitsMarkLasInputs" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Header="MarkLas control" Grid.Row="0" Grid.Column="3" >
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Vertical">
+                                    <Label Content="Име на маркиращ файл" Margin="10,0,0,0" FontSize="8" ></Label>
+                                    <TextBox x:Name="tbMarkFileName" Margin="10,0,0,0" FontSize="12" Width="200"/>
+                                </StackPanel>
+                                <Button x:Name="btnMLloadFile" Content="Load File" Height="30" VerticalAlignment="Bottom" FontSize="14" FontWeight="Bold" Margin="10,0,0,0" Click="btnMLloadFile_Click" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Vertical">
+                                    <Label Content="Име" FontSize="8" Margin="10,0,0,0" ></Label>
+                                    <TextBox x:Name="tbVarName" Text="V01" FontSize="14" FontWeight="Bold" Margin="10,0,0,0" Width="35" IsEnabled="False"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Margin="5,0,0,0">
+                                    <Label Content="Съдържание" FontSize="8" ></Label>
+                                    <TextBox x:Name="tbVarText" Width="160"/>
+                                </StackPanel>
+                                <Button x:Name="btnMLsetVar" Content="Set Var"  Height="30" FontSize="14" FontWeight="Bold" Margin="10,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="btnMLsetVar_Click"/>
+                           </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10,10">
+                                <Button x:Name="btnMLreset" Content="Reset" Margin ="0" FontSize="14" FontWeight="Bold" Click="btnMLreset_Click"/>
+                                <Button x:Name="btnMLshutter" Content="Shutter" Margin ="10,0,0,0" FontSize="14" FontWeight="Bold" Click="btnMLshutter_Click"/>
+                                <Button x:Name="btnMLmark" Content="Mark" Margin ="10,0,0,0"  FontSize="14" FontWeight="Bold" Click="btnMLmark_Click"/>
+                            </StackPanel>
+                            <DataGrid x:Name="dataGridMarkLaser" AutoGenerateColumns="False" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                              BorderBrush="CadetBlue" BorderThickness="1"
+                                              ScrollViewer.CanContentScroll="True" 
+                                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                              MaxHeight="300"
+                                              ItemsSource="{Binding}" 
+                                              CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="All" IsReadOnly="True"
+                                              HorizontalGridLinesBrush="#FFA0A0A0" VerticalGridLinesBrush="#FFA0A0A0" CanUserResizeRows="False"  
+                                              SelectionChanged="dataGridMarkLaser_SelectionChanged"
+                                              FontSize="14" ColumnHeaderHeight="29" HeadersVisibility="Column" x:FieldModifier="public" ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding RecDateTime}" Header="Час" FontWeight="Bold" FontSize="15"/>
+                                    <DataGridTextColumn Binding="{Binding Msg}" Header="Съобщение" FontWeight="Bold" FontSize="15" MaxWidth="230">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                                                <Setter Property="TextBlock.Foreground" Value="{Binding MsgForeground}"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <StackPanel Orientation ="Horizontal" Margin="0,10">
+                                <CheckBox x:Name="cbStopScrolling" Content="Stop Scrolling" />
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Маса" Name="tabItemRotary">
+                <Grid Name="gridRotationEnabled" Margin="0,0,3,0">
+                    <GroupBox Header="Условия за завъртане на масата" FontSize="20" Grid.Column="3" Margin="2,2" BorderThickness="2" BorderBrush="#FF8897B4" >
+                        <StackPanel Orientation="Vertical">
+                            <common:LedIndicator2 x:Name="ledAgronOut" Text="Дюзата на аргона е изтеглена" State="{Binding iCommonArgonNozzleOut}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                            <common:LedIndicator2 x:Name="ledPusherUp" Text="Пушерът е в Home позиция" State="{Binding iCommonPusherInHome}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                            <common:LedIndicator2 x:Name="ledTableInPos" Text="Масата е на позиция" State="{Binding iCommonRotTableInPos}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                            <common:LedIndicator2 x:Name="ledMuteAon" Text="MuteA на завесата е On" State="{Binding oCommonMuteA}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                            <common:LedIndicator2 x:Name="ledMuteBon" Text="MuteB на завесата е On" State="{Binding oCommonMuteB}" Height="Auto" FontSize="16" Style="{StaticResource InputLedStyle}"/>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+           
+            <TabItem Header="Камера" x:Name="tabItemVisions">
+                <CognexQBVisionControl:CognexQBvisionControl x:Name="CognexCameraUC" HorizontalAlignment="Left" Margin="13,23,0,0" VerticalAlignment="Top" Width="620" Height="320"/>
+            </TabItem>
+
+            <TabItem Header="Настройки" Name="tabItemSettings">
+                <Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <GroupBox>
+                            <GroupBox.Header>
+                                <TextBlock Text="PC settings" FontSize="16" FontWeight="Bold"/>
+                            </GroupBox.Header>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Номер на машина" Grid.Row="0" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <TextBox Name="textBoxMachineID" Style="{StaticResource DiagTextboxStyle}" Grid.Row="0" Grid.Column="1" Width="88" IsEnabled="True" />
+                                <Label Content="Сървър проследимост" Grid.Row="1" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <TextBox Name="textBoxTraceabilityServerIP" Style="{StaticResource DiagTextboxStyle}" Grid.Row="1" Grid.Column="1" Width="150" IsEnabled="True" />
+                                <Label Content="Сървър продукти" Grid.Row="2" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <TextBox Name="textBoxProductsServerIP" Style="{StaticResource DiagTextboxStyle}" Grid.Row="2" Grid.Column="1" Width="150" IsEnabled="True" />
+                                <Label Content="Сървър мониторинг" Grid.Row="3" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <TextBox Name="textBoxMonitoringServerIP" Style="{StaticResource DiagTextboxStyle}" Grid.Row="3" Grid.Column="1" Width="150" />
+                                <Label Content="Име на БД в с-мата за проследимост" Grid.Row="4" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <TextBox Name="textBoxServerDBname" Style="{StaticResource DiagTextboxStyle}" Grid.Row="4" Grid.Column="1" Width="150" />
+                                <Label Content="Име на локалната БД" Grid.Row="5" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <TextBox Name="textBoxLocalDBname" Style="{StaticResource DiagTextboxStyle}" Grid.Row="5" Grid.Column="1" Width="150" />
+                                <Label Content="Име на таблицата за продукти" Grid.Row="6" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <TextBox Name="textBoxTableProductsName" Style="{StaticResource DiagTextboxStyle}" Grid.Row="6" Grid.Column="1" Width="150" />
+                                <Label Content="Име на таблицата за резултати:" Grid.Row="7" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <TextBox Name="textBoxTableSensorsName" Style="{StaticResource DiagTextboxStyle}" Grid.Row="7" Grid.Column="1" Width="150" />
+                                <Label Content="COM-порт RFID" Grid.Row="8" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <ComboBox Name="comboBoxPortRFID" Style="{StaticResource DiagComboboxStyle}" Grid.Row="8" Grid.Column="1" IsEditable="True" Margin="2,2,0,2" />
+                                <Label Content="COM-порт баркод четец" Grid.Row="9" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <ComboBox Name="comboBoxPortBarcode" Style="{StaticResource DiagComboboxStyle}" Grid.Row="9" Grid.Column="1" IsEditable="True" Margin="2,2,0,2" />
+                                <Label Content="COM-порт маркиращ лазер" Grid.Row="10" Grid.Column="0" Style="{StaticResource DiagLabelStyle}" />
+                                <ComboBox Name="comboBoxPortMarkLaser" Style="{StaticResource DiagComboboxStyle}" Grid.Row="10" Grid.Column="1" IsEditable="True" Margin="2,2,0,2" SelectionChanged="dataGridMarkLaser_SelectionChanged"/>
+                                <CheckBox x:Name="cbShowErrors" Content="Показвай грешки при приключване на серия" Grid.Row="11" Grid.Column="0" Margin="10,0" Grid.ColumnSpan="2" VerticalAlignment="Center" />
+                                <CheckBox x:Name="cbProcessFlowLog" Content="Запис в лог-файл" Grid.Row="12" Grid.Column="0" Margin="10,0" Grid.ColumnSpan="2" VerticalAlignment="Center" />
+                                <CheckBox x:Name="cbRomanShifts" Content="Римски номера на смените" Grid.Row="13" Grid.Column="0" Margin="10,0" Grid.ColumnSpan="2" VerticalAlignment="Center" />
+                                <CheckBox x:Name="cbTraceabilityEnabled" Content="Проследимост" Grid.Row="14" Grid.Column="0" Margin="10,0" Grid.ColumnSpan="2" VerticalAlignment="Center" />
+                                <CheckBox x:Name="cbShowEndLotWindow" Content="Показвай екран за край на серия" Grid.Row="15" Grid.Column="0" Margin="10,0" Grid.ColumnSpan="2" VerticalAlignment="Center" />
+                                <Button VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="60" Width="180" Content="Възстановяване на Настройките"
+                                Style="{StaticResource AppDefaultButtonStyle}" Click="buttonRestoreSettings_Click" Background="#115599" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="16" Grid.RowSpan="2"/>
+                            </Grid>
+                         </GroupBox>
+                        <Grid>
+                            <GroupBox Margin="10,0">
+                                <GroupBox.Header>
+                                    <TextBlock Text="Firmware settings" FontSize="16" FontWeight="Bold"/>
+                                </GroupBox.Header>
+                                <StackPanel>
+                                    <StackPanel.Resources>
+                                        <Style TargetType="{x:Type CheckBox}">
+                                            <Setter Property="Margin" Value="0,15,0,0"/>
+                                            <Setter Property="FontSize" Value="16"/>
+                                        </Style>
+                                    </StackPanel.Resources>
+                                    <CheckBox Name="cbUseWelding" Content="Use Marking" Padding="10,0,0,0"/>
+                                    <CheckBox Name="cbUseMarking" Content="Use Welding" Padding="10,0,0,0"/>
+                                    <CheckBox Name="cbUseStation1" Content="Use Station 1" Padding="10,0,0,0"/>
+                                    <CheckBox Name="cbUseStation2" Content="Use Station 2" Padding="10,0,0,0"/>
+                                    <CheckBox Name="cbUseStation3" Content="Use Station 3" Padding="10,0,0,0"/>
+                                    <Grid Margin="0,15">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Welding program" Grid.Row="0" Grid.Column="0"/>
+                                        <TextBox Name="tbWeldingProgram" Grid.Row="0" Grid.Column="1" Style="{StaticResource DiagTextboxStyle}" Width="50" />
+                                        <Label Content="Festo Velocity" Grid.Row="1" Grid.Column="0"/>
+                                        <TextBox Name="tbFestoVelocity"  Grid.Row="1" Grid.Column="1" Style="{StaticResource DiagTextboxStyle}" Width="50" />
+                                        <Label Content="LinMot Velocity" Grid.Row="2" Grid.Column="0"/>
+                                        <TextBox Name="tbLinMotVelocity" Grid.Row="2" Grid.Column="1" Style="{StaticResource DiagTextboxStyle}" Width="80" />
+                                        <Label Content="LinMot Acc/Dec" Grid.Row="3" Grid.Column="0"/>
+                                        <TextBox Name="tbLinMotAccDec" Grid.Row="3" Grid.Column="1" Style="{StaticResource DiagTextboxStyle}" Width="80" />
+                                        <Label Content="Total Height" Grid.Row="4" Grid.Column="0"/>
+                                        <TextBox Name="tbTotalHeight" Grid.Row="4" Grid.Column="1" Style="{StaticResource DiagTextboxStyle}" Width="80" />
+                                        <Label Content="Product Length" Grid.Row="5" Grid.Column="0"/>
+                                        <TextBox Name="tbProductLength" Grid.Row="5" Grid.Column="1" Style="{StaticResource DiagTextboxStyle}" Width="80" IsEnabled="False"/>
+                                        <Label Content="Default Capture pos" Grid.Row="6" Grid.Column="0"/>
+                                        <TextBox Name="tbCameraCapture" Grid.Row="6" Grid.Column="1" Style="{StaticResource DiagTextboxStyle}" Width="80" />
+                                        <Label Content="Camera Offset" Grid.Row="7" Grid.Column="0" Style="{StaticResource DiagLabelStyle}"  Height="33" Width="100" HorizontalAlignment="Left"/>
+                                        <TextBox Name="CameraOffset" Style="{StaticResource DiagTextboxStyle}" Grid.Row="7" Grid.Column="1" Width="105" HorizontalAlignment="Right" IsEnabled="True" />
+                                    </Grid>
+                                    <Button Name="btnGettFirmwareSettings" Content="Get FW settings" Width="130" Foreground="Black" Background="Yellow" FontWeight="Bold" Click="btnGetFirmwareSettings_Click"/>
+                                    <Button Name="btnSetFirmwareSettings" Content="Set FW settings" Width="130" Foreground="Black" Background="Yellow" FontWeight="Bold" Click="btnSetFirmwareSettings_Click"/>
+                                </StackPanel>
+                            </GroupBox>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

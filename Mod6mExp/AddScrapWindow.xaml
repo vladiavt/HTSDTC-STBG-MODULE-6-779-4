@@ -1,0 +1,24 @@
+﻿<Window x:Class="Machine.AddScrapWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Добави брак" WindowStartupLocation="CenterScreen"
+				Loaded="Window_Loaded"
+				Style="{StaticResource WindowDefaultStyle}">
+	<Window.Resources>
+		<Style x:Name="LabelScrapCodeStyle" TargetType="Label">
+			<Setter Property="FontSize" Value="30"/>
+			<Setter Property="FontFamily" Value="Arial"/>
+			<Setter Property="Width" Value="50"/>
+			<Setter Property="Height" Value="40"/>
+			<Setter Property="HorizontalAlignment" Value="Left"/>
+			<Setter Property="VerticalAlignment" Value="Top"/>
+		</Style>
+	</Window.Resources>
+	
+	<Grid>
+		<Grid Margin="0,25,15,80" Name="gridButtons"/>
+		<Button Content="Cancel" FontSize="16"  Height="40" Width="150" HorizontalAlignment="Center" Margin="0,0,0,10" Background="#008899" 
+						VerticalAlignment="Bottom" Style="{StaticResource AppDefaultButtonStyle}" IsCancel="True" />
+	</Grid>
+
+</Window>

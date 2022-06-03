@@ -1,0 +1,78 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Machine.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="MachineID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">M0242</Value>
+    </Setting>
+    <Setting Name="PortRFID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">COM3</Value>
+    </Setting>
+    <Setting Name="PortBarcode" Type="System.String" Scope="User">
+      <Value Profile="(Default)">COM1</Value>
+    </Setting>
+    <Setting Name="MonitoringServerIP" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10.131.2.87</Value>
+    </Setting>
+    <Setting Name="TableProductsName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ProductsMod6</Value>
+    </Setting>
+    <Setting Name="TableSensorsName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tbl_ResuMachine6</Value>
+    </Setting>
+    <Setting Name="TraceabilityDBName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">AssemTrace</Value>
+    </Setting>
+    <Setting Name="ProductsServerIP" Type="System.String" Scope="User">
+      <Value Profile="(Default)">qsn.corp.sensata.com</Value>
+    </Setting>
+    <Setting Name="TraceabilityMachinesDBName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">MachinesTrace</Value>
+    </Setting>
+    <Setting Name="LocalTableName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Sensors</Value>
+    </Setting>
+    <Setting Name="LocalDBname" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Mod6MX</Value>
+    </Setting>
+    <Setting Name="ProcessFlowLog" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ShowCloseLotErrors" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PlcIP" Type="System.String" Scope="User">
+      <Value Profile="(Default)">192.168.250.1</Value>
+    </Setting>
+    <Setting Name="PortMarkLaser" Type="System.String" Scope="User">
+      <Value Profile="(Default)">COM4</Value>
+    </Setting>
+    <Setting Name="TraceabilityServerIP" Type="System.String" Scope="User">
+      <Value Profile="(Default)">qsn.corp.sensata.com</Value>
+    </Setting>
+    <Setting Name="MachineName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Mod68</Value>
+    </Setting>
+    <Setting Name="RomanShifts" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ChipLot" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="StartSN" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="CurrentSN" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="Traceability" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowEndLotWindow" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="CameraOffset" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>

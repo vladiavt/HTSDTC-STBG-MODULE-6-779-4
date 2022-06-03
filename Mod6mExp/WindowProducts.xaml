@@ -1,0 +1,100 @@
+﻿<Window x:Class="Machine.WindowProducts"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:kbd="clr-namespace:Machine.Common.VirtualKeyboard;assembly=COMMON_HMI"
+		xmlns:staticData="clr-namespace:Machine"
+        Title="Продукти" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" 
+				AllowsTransparency="True" WindowStyle="None" Background="Transparent"
+				Loaded="Window_Loaded" Closing="Window_Closing"
+				Style="{StaticResource WindowDefaultStyle}" Width="880">
+
+    <Grid Height="560">
+
+        <DataGrid AutoGenerateColumns="true" Name="dataGridProducts" VerticalAlignment="Top" Height="500" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" 
+							CanUserAddRows="True" CanUserResizeRows="False" AreRowDetailsFrozen="False" CanUserDeleteRows="True" 
+							ItemsSource="{Binding}" HorizontalGridLinesBrush="#FFE6E6E6" VerticalGridLinesBrush="#FFE6E6E6" 
+							CellEditEnding="dataGridProducts_CellEditEnding" CommandManager.PreviewExecuted="dataGridProducts_PreviewDeleteCommandHandler" 
+							FontSize="16" ColumnHeaderHeight="27" HeadersVisibility="Column" SelectionMode="Extended" SelectionUnit="FullRow" 
+							PreparingCellForEdit="dataGridProducts_PreparingCellForEdit"
+							ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}">
+            <!--<DataGrid.Columns>
+                <DataGridTemplateColumn Header="Продукт" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Product, Mode=TwoWay}" FontWeight="Bold" Padding="3,0,0,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Path=Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" kbd:PopupKeyboard.PlacementTarget="{Binding ElementName=textBoxDatagridProduct}" kbd:PopupKeyboard.IsEnabled="false" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Дължина MI" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=MILength, Mode=TwoWay}" Padding="3,0,0,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Path=MILength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" kbd:PopupKeyboard.PlacementTarget="{Binding ElementName=textBoxDatagridSize}" kbd:PopupKeyboard.IsEnabled="false"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Клип до MI (min)" Width="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=ChipToMI_MIN, Mode=TwoWay}" Padding="3,0,0,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Path=ChipToMI_MIN, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" kbd:PopupKeyboard.PlacementTarget="{Binding ElementName=textBoxDatagridSize}" kbd:PopupKeyboard.IsEnabled="false"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Клип до MI (max)" Width="140">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=ChipToMI_MAX, Mode=TwoWay}" Padding="3,0,0,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Path=ChipToMI_MAX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" kbd:PopupKeyboard.PlacementTarget="{Binding ElementName=textBoxDatagridSize}" kbd:PopupKeyboard.IsEnabled="false"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Разлика (Max)" Width="130">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=MaxMisalignment, Mode=TwoWay}" Padding="3,0,0,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Path=MaxMisalignment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" kbd:PopupKeyboard.PlacementTarget="{Binding ElementName=textBoxDatagridSize}" kbd:PopupKeyboard.IsEnabled="false"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Контраст" Width="130">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=IsCheckContrast, Mode=TwoWay}" Padding="3,0,0,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Path=IsCheckContrast, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" kbd:PopupKeyboard.PlacementTarget="{Binding ElementName=textBoxDatagridSize}" kbd:PopupKeyboard.IsEnabled="false"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>-->
+            <DataGrid.Effect>
+                <DropShadowEffect Color="Black" ShadowDepth="5" Opacity=".15" />
+            </DataGrid.Effect>
+        </DataGrid>
+        <!--<Image Name="image1" VerticalAlignment="Bottom" Source="/AutoChipAssembly;component/Images/AutoChipAssembly%20-%20ProductDrawing.PNG" Stretch="None" />-->
+    </Grid>
+</Window>

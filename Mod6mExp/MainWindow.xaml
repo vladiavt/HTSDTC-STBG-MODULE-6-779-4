@@ -1,0 +1,470 @@
+﻿<Window x:Class="Machine.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" 
+		xmlns:my="clr-namespace:Machine"      
+		xmlns:common="clr-namespace:Machine.Common;assembly=COMMON_HMI"
+		Loaded="Window_Loaded" Closing="Window_Closing" PreviewKeyDown="Window_PreviewKeyDown" 
+		SnapsToDevicePixels="True"
+		WindowState="Maximized"
+		WindowStyle="None"
+        ResizeMode="NoResize"
+		SizeToContent="WidthAndHeight"
+		Background="#FFD4B879">
+
+    <Window.Resources>
+        <Style x:Key="StatusLabelStyle" TargetType="{x:Type Label}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border BorderThickness="1" BorderBrush="Black" CornerRadius="2" VerticalAlignment="Top"  
+							Background="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"
+							Height="{Binding Height, RelativeSource={RelativeSource TemplatedParent}}">
+                            <TextBlock FontSize="16" Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" 
+								Padding="5,0,5,0" TextWrapping="Wrap" VerticalAlignment="Center" FontWeight="Medium" 
+								Foreground="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DefaultCellStyle" TargetType="{x:Type DataGridCell}">
+            <Style.Triggers>
+                <Trigger Property="DataGridCell.IsSelected" Value="True">
+                    <Setter Property="BorderBrush">
+                        <Setter.Value>
+                            <SolidColorBrush Color="Transparent"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource
+                                   {x:Static SystemColors.ControlTextBrushKey}}"/>
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="Transparent"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="InputLedStyle" TargetType="common:LedIndicator2">
+            <Style.Setters>
+                <Setter Property="ColorActive" Value="#FF58FF18"/>
+                <Setter Property="ColorInactive" Value="#FF0A380A"/>
+                <Setter Property="IndicatorType" Value="LED_INPUT"/>
+                <Setter Property="IndicatorDiameter" Value="18"/>
+                <Setter Property="TextSize" Value="12"/>
+                <Setter Property="FontFamily" Value="Arial"/>
+            </Style.Setters>
+        </Style>
+    </Window.Resources>
+
+    <Grid Width="1024" Height="768">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="180"/>
+        </Grid.ColumnDefinitions>
+
+        <Label x:Name="labelStatus" Content="Съобщения от общ характер" HorizontalContentAlignment="Left" Height="45" Margin="5,5,5,0"  
+			VerticalAlignment="Top" Background="White" BorderBrush="DarkGray" VerticalContentAlignment="Center" FontSize="24" 
+			FontWeight="Normal" Foreground="#FF404040" BorderThickness="1" />
+
+        <WrapPanel HorizontalAlignment="Right" Margin="0,5,5,0" VerticalAlignment="Top">
+            <Label x:Name="labelSafetyOff" Width="150" Height="45" FontSize="18" FontWeight="Medium" BorderBrush="Red" Foreground="Yellow" Background="Red" Style="{StaticResource StyleLabelRoundedCorners}">
+                <TextBlock Text="Изключена защита" TextAlignment="Center" TextWrapping="Wrap" LineHeight="16" LineStackingStrategy="BlockLineHeight" Padding="0,3,0,0"/>
+            </Label>
+        </WrapPanel>
+
+        <StackPanel Orientation="Vertical" Margin="0,0,0,5">
+            <Grid VerticalAlignment="Top" Margin="5,60,0,0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="60"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label Content="Зареждане:" FontSize="20" FontWeight="DemiBold" Grid.Column="0"></Label>
+                <Border CornerRadius="3" BorderBrush="Black" Background="AntiqueWhite" BorderThickness="2" Grid.Column="1">
+                    <Label Name ="lblSt1Status" FontSize="20" Foreground="Black" Content="{Binding StatusString}" Background="{Binding StatusBackground}"></Label>
+                </Border>
+                <Border CornerRadius="3" BorderBrush="Lavender" Background="BlueViolet" BorderThickness="2" Grid.Column="2">
+                    <Label Name="lblSt1Duration" Margin="2" Content="0:19" HorizontalAlignment="Right" FontSize="16" Foreground="Yellow" ></Label>
+                </Border>
+            </Grid>
+            <Grid VerticalAlignment="Top" Margin="5,5,0,0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="60"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label Content="Заваряване:" FontSize="20" FontWeight="DemiBold" Grid.Column="0"></Label>
+                <Border CornerRadius="3" BorderBrush="Black" Background="AntiqueWhite" BorderThickness="2" Grid.Column="1">
+                    <Label Name ="lblSt2Status" FontSize="20" Foreground="Black" Content="{Binding StatusString}" Background="{Binding StatusBackground}"></Label>
+                </Border>
+                <Border CornerRadius="3" BorderBrush="Lavender" Background="BlueViolet" BorderThickness="2" Grid.Column="2">
+                    <Label Name="lblSt2Duration" Margin="2" Content="0:28" HorizontalAlignment="Right" FontSize="16" Foreground="Yellow" ></Label>
+                </Border>
+            </Grid>
+            <Grid VerticalAlignment="Top" Margin="5,5,0,0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="60"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label Content="Маркиране:" FontSize="20" FontWeight="DemiBold" Grid.Column="0"></Label>
+                <Border CornerRadius="3" BorderBrush="Black" Background="AntiqueWhite" BorderThickness="2" Grid.Column="1">
+                    <Label Name ="lblSt3Status" FontSize="20" Foreground="Black" Content="{Binding StatusString}" Background="{Binding StatusBackground}"></Label>
+                </Border>
+                <Border CornerRadius="3" BorderBrush="Lavender" Background="BlueViolet" BorderThickness="2" Grid.Column="2">
+                    <Label Name="lblSt3Duration" Margin="2" Content="0:34" HorizontalAlignment="Right" FontSize="16" Foreground="Yellow" ></Label>
+                </Border>
+            </Grid>
+            <Grid VerticalAlignment="Top" Margin="5,5,0,0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="Auto" MinWidth="27"/>
+                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="66*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label Content="Маркиране:" HorizontalAlignment="left" Grid.Column="0" Grid.Row="0" Style="{StaticResource LotLabelsValue}" />
+                <Label Content="L1" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="0" Style="{StaticResource LotLabelsValue}" FontWeight="Bold" Width="15"/>
+                <Label Content="L2" HorizontalAlignment="Center" Grid.Column="3" Grid.Row="0" Style="{StaticResource LotLabelsValue}" FontWeight="Bold" Width="15"/>
+                <Label Content="L3" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1" Style="{StaticResource LotLabelsValue}" FontWeight="Bold" Width="15"/>
+                <Label Content="L4" HorizontalAlignment="Center" Grid.Column="3" Grid.Row="1" Style="{StaticResource LotLabelsValue}" FontWeight="Bold" Width="15"/>
+                <TextBox Name ="tbL1" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="0" IsEnabled="False" Height="18" Width="180"/>
+                <TextBox Name ="tbL2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="4" Grid.Row="0" IsEnabled="False" Height="18" Width="180"/>
+                <TextBox Name ="tbL3" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="1" IsEnabled="False" Height="18" Width="180"/>
+                <TextBox Name ="tbL4" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="4" Grid.Row="1" IsEnabled="False" Height="18" Width="180"/>
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Width="540" Height="510" Margin="5,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+            <Border Height="300" Margin="0,0,0,5" Background="#FFFAFAFA" BorderBrush="#FF677EA0" BorderThickness="1" CornerRadius="2">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="5" Opacity="0.2" BlurRadius="5" />
+                </Border.Effect>
+                <Grid>
+                    <DataGrid Name="dataGridSensors" AutoGenerateColumns="False" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding}" 
+                                                                     CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="All" 
+                                                                     HorizontalGridLinesBrush="#FFA0A0A0" VerticalGridLinesBrush="#FFA0A0A0" CanUserResizeRows="False" BorderThickness="0" 
+                                                                     FontSize="12" ColumnHeaderHeight="33" HeadersVisibility="Column" x:FieldModifier="public" IsReadOnly="true"
+                                                                     ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle2}" UseLayoutRounding="True">
+                        <DataGrid.Columns>
+                            <!--<DataGridTextColumn Binding="{Binding Path=Number}" Width="36" Header="№" CellStyle="{StaticResource StyleSensorGridCellFirstColumn}"/>-->
+                            <DataGridTextColumn Binding="{Binding Path=StationNo}" Width="60" FontWeight="Bold" FontSize="15">
+                                <DataGridTextColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="Станция" LineStackingStrategy="BlockLineHeight" LineHeight="14">
+                                            <TextBlock.Effect>
+                                                <DropShadowEffect Color="Black" Direction="320" ShadowDepth="0.7" Opacity=".5"/>
+                                            </TextBlock.Effect>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTextColumn.HeaderTemplate>
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="{x:Type DataGridCell}">
+                                        <Setter Property="Foreground" Value="{Binding StationNoForeground}"/>
+                                        <Setter Property="Background" Value="{Binding StationNoBackground}"/>
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Foreground" Value="{Binding StationNoForeground}"/>
+                                                <Setter Property="Background" Value="{Binding StationNoBackground}" />
+                                                <Setter Property="BorderBrush" Value="{x:Null}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Path=Result}" Width="150" FontWeight="Bold" FontSize="15">
+                                <DataGridTextColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="Резултат" LineStackingStrategy="BlockLineHeight" LineHeight="14">
+                                            <TextBlock.Effect>
+                                                <DropShadowEffect Color="Black" Direction="360" ShadowDepth="0.7" Opacity=".5"/>
+                                            </TextBlock.Effect>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTextColumn.HeaderTemplate>
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="{x:Type DataGridCell}">
+                                        <Setter Property="Foreground" Value="{Binding ResultForeground}"/>
+                                        <Setter Property="Background" Value="{Binding ResultBackground}"/>
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Foreground" Value="{Binding ResultForeground}"/>
+                                                <Setter Property="Background" Value="{Binding ResultBackground}" />
+                                                <Setter Property="BorderBrush" Value="{x:Null}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Path=RecDateTime}" Width="*" FontWeight="Bold" FontSize="15">
+                                <DataGridTextColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="Час на обработка" LineStackingStrategy="BlockLineHeight" LineHeight="11">
+                                            <TextBlock.Effect>
+                                                <DropShadowEffect Color="Black" Direction="320" ShadowDepth="0.7" Opacity=".5"/>
+                                            </TextBlock.Effect>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTextColumn.HeaderTemplate>
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="{x:Type DataGridCell}">
+                                        <Setter Property="Foreground" Value="{Binding TimeForeground}"/>
+                                        <Setter Property="Background" Value="{Binding TimeBackground}"/>
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Foreground" Value="{Binding TimeForeground}"/>
+                                                <Setter Property="Background" Value="{Binding TimeBackground}"/>
+                                                <Setter Property="BorderBrush" Value="{x:Null}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                </Grid>
+            </Border>
+
+            <TabControl>
+                <TabItem Name="TabItemLogs" Header="Съобщения">
+                    <Border Height="220" Margin="0,0,0,0" Background="#FFFAFAFA" BorderBrush="#FF677EA0" BorderThickness="1" CornerRadius="2" >
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="320" ShadowDepth="5" Opacity="0.2" BlurRadius="5" />
+                        </Border.Effect>
+                        <Grid>
+                            <Border Height="24" VerticalAlignment="Top">
+                                <Border.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF8F9EBA" Offset="0" />
+                                        <GradientStop Color="#FF6D86A7" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Label Content="Съобщения" x:Name="label2" FontSize="14" Foreground="White" VerticalAlignment="Center" Padding="5,0,0,0">
+                                    <Label.Effect>
+                                        <DropShadowEffect Color="Black" Direction="320" ShadowDepth="0.7" Opacity="0.7"/>
+                                    </Label.Effect>
+                                </Label>
+                            </Border>
+                            <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="2,29,0,0" x:Name="dataGridLogs" VerticalAlignment="Top" 
+						        ItemsSource="{Binding}" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" 
+						        GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#FFE6E6E6" HeadersVisibility="None" CanUserResizeRows="False" 
+						        BorderThickness="0" FontSize="12" HorizontalScrollBarVisibility="Disabled" >
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding RecDateTime}" Foreground="#FF303030" Width="115"/>
+                                    <DataGridTemplateColumn Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock VerticalAlignment="Top" Padding="7,-2,0,0" TextWrapping="Wrap" Text="{Binding Log}" FontWeight="Bold" FontSize="14" Foreground="#FF303030" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </TabItem>
+                <TabItem Name="TabItemsLots" Header="Серии">
+                    <Border Height="230" Margin="0,0,0,0" Background="#FFFAFAFA" BorderBrush="#FF677EA0" BorderThickness="1" CornerRadius="2" >
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="320" ShadowDepth="5" Opacity="0.2" BlurRadius="5" />
+                        </Border.Effect>
+                        <Grid>
+                            <DataGrid x:Name="dataGridLots" AutoGenerateColumns="False" HorizontalAlignment="Left" VerticalAlignment="Top" 
+						ItemsSource="{Binding}" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" 
+						GridLinesVisibility="All" HorizontalGridLinesBrush="#FFD0D0D0" VerticalGridLinesBrush="#FFD0D0D0" CanUserResizeRows="False" 
+						BorderThickness="0" FontSize="14" ColumnHeaderHeight="24" HeadersVisibility="Column" x:FieldModifier="public"
+						ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Lot}" Width="80" Header="Серия" FontWeight="Medium" />
+                                    <DataGridTextColumn Binding="{Binding Product}" Width="70" Header="Продукт" />
+                                    <DataGridTextColumn Binding="{Binding Order}" Width="70" Header="Поръчка" />
+                                    <DataGridTextColumn Binding="{Binding OperatorNumber}" Width="75" Header="Оператор" />
+                                    <DataGridTextColumn Binding="{Binding Quantity}" Width="45" Header="Брой" />
+                                    <DataGridTextColumn Binding="{Binding RecDateTime}" Width="*" Header="Начало" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Width="270" Margin="0,0,12,5" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <common:LedIndicator2 Name="indTraceabilityEnabled" Margin="5,0,5,10" Text="Проследимост" State="{Binding TraceabilityEnabled}" Height="Auto" FontSize="10" Style="{StaticResource InputLedStyle}"/>
+            <Border Height="120" Style="{StaticResource MainWindowBorderPanes}" VerticalAlignment="Top">
+                <Grid Margin="5" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label Content="За обработка" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource LotLabelsValue}" Margin="0,4,4,4"/>
+                    <Label Content="Брак" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" Style="{StaticResource LotLabelsValue}" Margin="0,4,4,4"/>
+                    <Label Content="Текущ SN" Visibility="Hidden" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" Style="{StaticResource LotLabelsValue}" Margin="0,4,4,4"/>
+
+                    <Label x:Name="labelPieces" Grid.Column="2" Grid.Row="0" Style="{StaticResource LotLabelsValueStyle}" FontSize="26"/>
+                    <Label x:Name="labelPiecesNOK" Grid.Column="1" Grid.Row="1" Style="{StaticResource LotLabelsValueStyle}" FontSize="26" Height="32" Margin="2,2,2,0" VerticalAlignment="Top"/>
+                    <Label x:Name="labelCurrentSN" Visibility="Hidden" Grid.Column="2" Grid.Row="2" Style="{StaticResource LotLabelsValueStyle}" FontSize="26"/>
+                </Grid>
+            </Border>
+            <Border Height="220" Style="{StaticResource MainWindowBorderPanes}" Margin="0,0,0,5">
+                <Grid Margin="5,5,5,5" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="95" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label Content="Серия" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource LotLabelsValue}"/>
+                    <Label Content="Продукт" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" Style="{StaticResource LotLabelsValue}" />
+                    <Label Content="Поръчка" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" Style="{StaticResource LotLabelsValue}"/>
+                    <Label Content="Количество" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right" Style="{StaticResource LotLabelsValue}"/>
+                    <Label Content="Оператор" Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" Style="{StaticResource LotLabelsValue}"/>
+                    <Label Content="Начален SN" Visibility="Hidden" Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" Style="{StaticResource LotLabelsValue}"/>
+                    <Label x:Name="labelLot" Grid.Column="1" Grid.Row="0" Style="{StaticResource LotLabelsValueStyle}" FontSize="24"/>
+                    <Label x:Name="labelProduct" Grid.Column="1" Grid.Row="1" Style="{StaticResource LotLabelsValueStyle}" FontSize="24"/>
+                    <Label x:Name="labelOrder" Grid.Column="1" Grid.Row="2" Style="{StaticResource LotLabelsValueStyle}" FontSize="24"/>
+                    <Label x:Name="labelQuantity" Grid.Column="1" Grid.Row="3" Style="{StaticResource LotLabelsValueStyle}" FontSize="24"/>
+                    <Label x:Name="labelOperator" Grid.Column="1" Grid.Row="4" Style="{StaticResource LotLabelsValueStyle}" FontSize="24"/>
+                    <Label x:Name="labelStartSN" Visibility="Hidden" Grid.Column="1" Grid.Row="5" Style="{StaticResource LotLabelsValueStyle}" FontSize="24"/>
+                </Grid>
+            </Border>
+            <Border Height="45" Style="{StaticResource MainWindowBorderPanes}" Margin="0,0,0,5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Серия време" FontSize="12" Foreground="#101010" Padding="0,1,5,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" />
+                    <Label x:Name="labelLotTime" Content="00:00:00" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" FontSize="16" Padding="7,1,0,0" VerticalContentAlignment="Center" FontWeight="Bold"/>
+                    <Label Content="Такт време" FontSize="12" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" Foreground="#101010" Padding="0,0,5,0" VerticalContentAlignment="Center" />
+                    <Label x:Name="labelCycleTime" Content="00:00:00" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" FontSize="16" Padding="7,0,0,0" VerticalContentAlignment="Center" FontWeight="Bold"/>
+                </Grid>
+            </Border>
+            <StackPanel Orientation="Horizontal">
+                <Border Height="80" Width="220" HorizontalAlignment="Left" Style="{StaticResource MainWindowBorderPanes}" Margin="0,0,0,5">
+                    <common:MachineWorkloadPieDiagram x:Name="pieChartWorkload" ChartDiameter="60" />
+                </Border>
+                <Border CornerRadius="50"
+                    Width="40"
+                    Height="40"
+                    Margin="10"
+                    Background="Black"
+                    BorderBrush="White"
+                    BorderThickness="1">
+                    <TextBlock x:Name="tbTablePosition" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontWeight="Bold" Foreground="White">4
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+            <Border Height="28" Style="{StaticResource MainWindowBorderPanes}" Margin="0,0,90,0">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="UpTime:" HorizontalAlignment="Left" Padding="10,0,10,0" VerticalContentAlignment="Center" />
+                    <Label x:Name="labelUpTime" Content="00:00:00" HorizontalAlignment="Left" FontSize="16" VerticalContentAlignment="Center" FontWeight="Bold" Foreground="#FF101010" Padding="0,0,10,0" />
+                    <Label x:Name="QueueCount" Content="0" HorizontalAlignment="Right"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Grid Grid.Column="1">
+            <StackPanel Background="#FFB7BED4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Style="{StaticResource ResourceKey=minimizeButtonStyle}" Grid.Column="0" Height="40" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,7,0,0" x:Name="buttonMinimize" Click="buttonMinimize_Click" />
+                        <Button Style="{StaticResource ResourceKey=closeButtonStyle}" Grid.Column="1" Height="40" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,7,0,0" x:Name="buttonClose" Click="buttonClose_Click" />
+                    </Grid>
+                    <Button Content="Инициализация" x:Name="buttonInit" Grid.Row="1" Click="buttonInit_Click" Style="{StaticResource AppDefaultButtonStyle}" Margin="10" FontSize="15" Background="#FF440000" />
+                    <Button Content="Диагностика" x:Name="buttonDiag" Grid.Row="2" Click="buttonDiag_Click" Style="{StaticResource AppDefaultButtonStyle}" Margin="10" FontSize="16" Background="#FF440000" />
+                    <Button Content="Нова серия" x:Name="buttonNewLot" Grid.Row="3" Click="buttonNewLot_Click" Style="{StaticResource AppDefaultButtonStyle}" Margin="10" FontSize="16" Background="#FF440000" />
+                    <Button Content="Продукти" x:Name="buttonProducts" Grid.Row="4" Click="buttonProducts_Click" Style="{StaticResource AppDefaultButtonStyle}" Margin="10" FontSize="16" Background="#FF440000" />
+                    <Button Content="Добави брак" x:Name="buttonAddScrap" Grid.Row="5" Click="buttonAddScrap_Click" Style="{StaticResource AppDefaultButtonStyle}" Margin="10" FontSize="16" Background="#FFFF0000" />
+                    <Button Content="Разтоварване" x:Name="btnUnload" Grid.Row="6" Style="{StaticResource AppDefaultButtonStyle}" Click="btnUnload_Click" Margin="10" FontSize="16" Background="Cyan" />
+                    <Button Content="Въведи престой" x:Name="buttonProcessDowntime" Grid.Row="7" Click="buttonProcessDowntime_Click" Style="{StaticResource AppDefaultButtonStyle}" Margin="10" FontSize="16" Background="Yellow" />
+
+                    <CheckBox Name="cbUseWelding" Content="Използвай маркиране" Grid.Row="8" Grid.Column="0" Margin="10,0" Grid.ColumnSpan="2" VerticalAlignment="Center"  />
+                    <CheckBox Name="cbUseMarking" Content="Използвай заваряване" Grid.Row="9" Grid.Column="0" Margin="10,0" Grid.ColumnSpan="2" VerticalAlignment="Center" />
+                    <!--<Button Name="btnGettFirmwareSettings"  Content="Вземи настройки" Grid.Row="10" Grid.Column="0" Margin="10,0" Width="150" Foreground="Black" Background="Yellow" FontWeight="Bold"  Click="btnGetFirmwareSettings_Click"/>-->
+                    <Button Name="btnSetFirmwareSettings" Content="Запази настройки" Grid.Row="11" Grid.Column="0" Margin="10,0" Width="150" Foreground="Black" Background="Yellow" FontWeight="Bold" Click="btnSetFirmwareSettings_Click"/>
+                    <Border Height="Auto" Style="{StaticResource MainWindowBorderPanes}" Grid.Row="12" Margin="0,0,0,5">
+                        <Grid Margin="5,5,5,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <DataGrid Grid.Row="0" Grid.Column="0" Name="bitsHflags" ItemsSource="{Binding}" AutoGenerateColumns="False" CellStyle="{StaticResource DefaultCellStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <common:LedIndicator2 Text="{Binding BitText}" State="{Binding BitValue}" Height="Auto" Width="160" FontSize="10" Style="{StaticResource InputLedStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </StackPanel>
+            <common:DateTimeBox x:Name="dateTimeBox1" Margin="5" BorderThickness="0" BorderBrush="Black" VerticalAlignment="Bottom" />
+        </Grid>
+    </Grid>
+
+</Window>

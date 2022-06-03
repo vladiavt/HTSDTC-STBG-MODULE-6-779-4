@@ -1,0 +1,47 @@
+﻿<Window x:Class="Machine.WindowOldLot"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title=""
+				WindowStartupLocation="CenterScreen"
+				Style="{StaticResource WindowDefaultStyleWithoutTitlebar}" Loaded="Window_Loaded">
+
+	<Window.Resources>
+		<Style x:Key="LabelStyle" TargetType="Label">
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+			<Setter Property="HorizontalAlignment" Value="Right" />
+			<Setter Property="Foreground" Value="White" />
+			<Setter Property="FontSize" Value="18" />
+			<Setter Property="Effect">
+				<Setter.Value>
+					<DropShadowEffect Color="Black" ShadowDepth="2" Opacity=".5" />
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<Style x:Key="TextBlockStyle" TargetType="TextBlock">
+			<Setter Property="HorizontalAlignment" Value="Right" />
+			<Setter Property="Foreground" Value="White" />
+			<Setter Property="FontSize" Value="18" />
+			<Setter Property="Effect">
+				<Setter.Value>
+					<DropShadowEffect Color="Black" ShadowDepth="2" Opacity=".5" />
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</Window.Resources>
+	
+	<Grid Width="500">
+		<StackPanel>
+			<TextBlock Name="Text1" Text="Серията вече е въвеждана в машината" Padding="20,10,0,0" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource TextBlockStyle}" FontSize="20"/>
+			<Grid>
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+					<Button Name="buttonStartLot" Background="#115599" Content="Продължаване на серията" Height="60" Margin="10,30,10,0" 
+									Style="{StaticResource AppDefaultButtonStyle}" VerticalAlignment="Bottom" Width="200" FontSize="16" Click="buttonStartLot_Click" />
+					<Button Name="buttonCancelLot" Background="#115599" Content="Отхвърляне" Height="60" Margin="10,30,10,0"
+									Style="{StaticResource AppDefaultButtonStyle}" VerticalAlignment="Bottom" Width="200" FontSize="16" Click="buttonCancelLot_Click" />
+					<Button Name="buttonOK" Background="#115599" Content="OK" Height="60" Margin="10,30,10,0" Visibility="Collapsed"
+									Style="{StaticResource AppDefaultButtonStyle}" VerticalAlignment="Bottom" Width="200" FontSize="16" Click="buttonOK_Click" />
+				</StackPanel>
+			</Grid>
+		</StackPanel>
+	</Grid>
+</Window>
